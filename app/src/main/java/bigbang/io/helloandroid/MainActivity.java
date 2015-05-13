@@ -41,6 +41,14 @@ public class MainActivity extends ActionBarActivity {
         chatInput = (EditText) findViewById(R.id.chatEntry);
         chatWindow = (ListView) findViewById(R.id.listView);
 
+        Log.i("bigbang", "onCreate()");
+
+        initChat();
+
+    }
+
+    private void initChat() {
+        getActionBar().setTitle("CONNECTING...");
 
         final Handler bigBangHandler = new Handler(getMainLooper());
         client = new AndroidBigBangClient(new Action<Runnable>() {
@@ -54,9 +62,9 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void result(ConnectionError error) {
                 if (error != null) {
-                    Log.i("bigbang", error.getMessage());
+                    Log.i("bigbang", error.toString());
                 } else {
-
+                    getActionBar().setTitle("CONNECTED");
                     client.subscribe("helloChat", new Action2<ChannelError, Channel>() {
                         @Override
                         public void result(ChannelError channelError, Channel channel) {
@@ -73,7 +81,15 @@ public class MainActivity extends ActionBarActivity {
                 }
             }
         });
+
+        client.disconnected(new Action<Void>() {
+            @Override
+            public void result(Void result) {
+                getActionBar().setTitle("DISCONNECTED");
+            }
+        });
     }
+
 
     private void updateChatWindow(String newChat) {
         chats.add(newChat);
@@ -81,11 +97,33 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void chatButtonClick(View v) {
-        JsonObject json = new JsonObject();
-        json.putString("msg", chatInput.getText().toString());
-        chatInput.setText("");
-        chatChannel.publish(json);
+        String inputText = chatInput.getText().toString();
+
+        if( null != inputText && inputText.length() > 0) {
+            JsonObject json = new JsonObject();
+            json.putString("msg", inputText);
+            chatInput.setText("");
+            chatChannel.publish(json);
+        }
     }
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.i("bigbang", "onStop()");
+    }
+
+    @Override
+    public void onRestart() {
+        super.onRestart();
+        Log.i("bigbang", "onRestart()");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.i("bigbang", "onPause()");
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
