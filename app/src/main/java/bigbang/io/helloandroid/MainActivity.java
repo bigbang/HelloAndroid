@@ -13,6 +13,7 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import io.bigbang.client.Action;
 import io.bigbang.client.Action2;
 import io.bigbang.client.AndroidBigBangClient;
@@ -40,11 +41,10 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         chatInput = (EditText) findViewById(R.id.chatEntry);
         chatWindow = (ListView) findViewById(R.id.listView);
+        chatInput.setEnabled(false);
 
         Log.i("bigbang", "onCreate()");
-
         initChat();
-
     }
 
     private void initChat() {
@@ -64,7 +64,9 @@ public class MainActivity extends ActionBarActivity {
                 if (error != null) {
                     Log.i("bigbang", error.toString());
                 } else {
+
                     getActionBar().setTitle("CONNECTED");
+                    chatInput.setEnabled(true);
                     client.subscribe("helloChat", new Action2<ChannelError, Channel>() {
                         @Override
                         public void result(ChannelError channelError, Channel channel) {
@@ -99,13 +101,14 @@ public class MainActivity extends ActionBarActivity {
     public void chatButtonClick(View v) {
         String inputText = chatInput.getText().toString();
 
-        if( null != inputText && inputText.length() > 0) {
+        if (null != inputText && inputText.length() > 0) {
             JsonObject json = new JsonObject();
             json.putString("msg", inputText);
             chatInput.setText("");
             chatChannel.publish(json);
         }
     }
+
     @Override
     public void onStop() {
         super.onStop();
@@ -122,6 +125,13 @@ public class MainActivity extends ActionBarActivity {
     public void onPause() {
         super.onPause();
         Log.i("bigbang", "onPause()");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        client.disconnect();
+        Log.i("bigbang", "onDestroy()");
     }
 
 
