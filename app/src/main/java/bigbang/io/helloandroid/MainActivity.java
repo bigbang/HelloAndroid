@@ -43,7 +43,6 @@ public class MainActivity extends ActionBarActivity {
         chatWindow = (ListView) findViewById(R.id.listView);
         chatInput.setEnabled(false);
 
-        Log.i("bigbang", "onCreate()");
         initChat();
     }
 
@@ -64,7 +63,6 @@ public class MainActivity extends ActionBarActivity {
                 if (error != null) {
                     Log.i("bigbang", error.toString());
                 } else {
-
                     getActionBar().setTitle("CONNECTED");
                     chatInput.setEnabled(true);
                     client.subscribe("helloChat", new Action2<ChannelError, Channel>() {
@@ -110,30 +108,16 @@ public class MainActivity extends ActionBarActivity {
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        Log.i("bigbang", "onStop()");
-    }
-
-    @Override
     public void onRestart() {
         super.onRestart();
-        Log.i("bigbang", "onRestart()");
+        initChat();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Log.i("bigbang", "onPause()");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
         client.disconnect();
-        Log.i("bigbang", "onDestroy()");
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
